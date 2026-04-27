@@ -79,19 +79,23 @@
 <script>
     let currentPairs = [];
 
+    // This part runs when someone opens a shared link
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const sharedData = urlParams.get('s');
         if (sharedData) {
             try {
-                const decoded = decodeURIComponent(sharedData);
+                // Decodes the Base64 string back into Khmer characters correctly
+                const decoded = decodeURIComponent(escape(atob(sharedData)));
                 const pairs = decoded.split('|').map(item => {
                     const [group, topic] = item.split(':');
                     return { group, topic };
                 });
                 displayResults(pairs, true);
                 document.getElementById('setupArea').style.display = 'none';
-            } catch (e) { console.error("Link error", e); }
+            } catch (e) { 
+                console.error("Link error", e); 
+            }
         }
     };
 
@@ -100,7 +104,7 @@
         let topics = document.getElementById('topicsInput').value.split('\n').filter(t => t.trim() !== "");
         
         if (groups.length === 0 || topics.length < groups.length) {
-            return alert("សូមពិនិត្យមើលបញ្ជីឈ្មោះក្រុម និងប្រធានបទឡើងវិញ! (ចំនួនប្រធានបទត្រូវតែស្មើ ឬច្រើនជាងចំនួនក្រុម)");
+            return alert("សូមពិនិត្យមើលបញ្ជីឈ្មោះក្រុម និងប្រធានបទឡើងវិញ!");
         }
 
         const shuffledTopics = [...topics].sort(() => Math.random() - 0.5);
@@ -133,10 +137,14 @@
         }, isShared ? 100 : 1200);
     }
 
+    // This creates the much shorter Base64 link
     function copyShareLink() {
         if (currentPairs.length === 0) return;
         const compactString = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
-        const encoded = encodeURIComponent(compactString);
+        
+        // Encodes Khmer text into a shorter alphabet/number string
+        const encoded = btoa(unescape(encodeURIComponent(compactString)));
+        
         const url = window.location.origin + window.location.pathname + '?s=' + encoded;
         navigator.clipboard.writeText(url).then(() => alert("តំណភ្ជាប់លទ្ធផលត្រូវបានចម្លង!"));
     }
