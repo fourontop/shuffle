@@ -6,17 +6,19 @@
     <title>ចាប់ប្រធានបទ</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #8b5cf6; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; }
+        :root { --primary: #8b5cf6; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --success: #10b981; }
         body { font-family: 'Kantumruy Pro', sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1rem; margin: 0; min-height: 100vh; }
         .container { max-width: 600px; width: 100%; text-align: center; padding-bottom: 100px; }
         h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 2rem; }
         .inputs { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem; }
         .input-group { text-align: left; }
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; opacity: 0.8; color: var(--primary); }
-        textarea { width: 100%; height: 110px; padding: 12px; border-radius: 12px; border: 1px solid #334155; background: var(--card-bg); color: white; font-size: 16px; resize: none; box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
+        textarea { width: 100%; height: 110px; padding: 12px; border-radius: 12px; border: 1px solid #334155; background: var(--card-bg); color: white; font-size: 16px; resize: none; box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; transition: border-color 0.3s; }
+        textarea:focus { outline: none; border-color: var(--primary); }
         .btn-row { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { flex: 2; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; padding: 1rem; font-size: 1rem; font-weight: bold; border-radius: 12px; cursor: pointer; font-family: 'Kantumruy Pro', sans-serif; }
+        button { flex: 2; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; padding: 1rem; font-size: 1rem; font-weight: bold; border-radius: 12px; cursor: pointer; font-family: 'Kantumruy Pro', sans-serif; transition: all 0.3s ease; }
         #shareBtn { flex: 1; background: #334155; display: none; }
+        button.copy-success { background: var(--success) !important; }
         #results { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 2rem; width: 100%; }
         .card { height: 190px; perspective: 1000px; }
         .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transform-style: preserve-3d; }
@@ -40,11 +42,11 @@
         <div class="inputs">
             <div class="input-group">
                 <label>បញ្ជីឈ្មោះក្រុម</label>
-                <textarea id="groupsInput" placeholder="ក្រុមទី១..."></textarea>
+                <textarea id="groupsInput" placeholder="បញ្ចូលឈ្មោះក្រុមនៅទីនេះ (មួយក្រុមក្នុងមួយជួរ)&#10;ឧទាហរណ៍៖&#10;ក្រុមទី១&#10;ក្រុមទី២"></textarea>
             </div>
             <div class="input-group">
                 <label>បញ្ជីប្រធានបទ</label>
-                <textarea id="topicsInput" placeholder="ប្រធានបទ..."></textarea>
+                <textarea id="topicsInput" placeholder="បញ្ចូលប្រធានបទនៅទីនេះ (មួយក្នុងមួយជួរ)&#10;ឧទាហរណ៍៖&#10;ប្រវត្តិវិទ្យា&#10;វិទ្យាសាស្ត្រ"></textarea>
             </div>
         </div>
         <div class="btn-row">
@@ -65,7 +67,6 @@
         const s = urlParams.get('s');
         if (s) {
             try {
-                // Modern decoding that handles Khmer perfectly
                 const binary = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
                 const bytes = new Uint8Array(binary.length);
                 for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
@@ -84,7 +85,7 @@
     function runAssignment() {
         const gIn = document.getElementById('groupsInput').value.split('\n').filter(g => g.trim() !== "");
         const tIn = document.getElementById('topicsInput').value.split('\n').filter(t => t.trim() !== "");
-        if (gIn.length === 0 || tIn.length < gIn.length) return alert("សូមពិនិត្យមើលបញ្ជីឡើងវិញ!");
+        if (gIn.length === 0 || tIn.length < gIn.length) return alert("សូមពិនិត្យមើលបញ្ជីឡើងវិញ! ចំនួនប្រធានបទត្រូវតែស្មើ ឬច្រើនជាងចំនួនក្រុម។");
         
         const shuffled = [...tIn].sort(() => Math.random() - 0.5);
         currentPairs = gIn.map((g, i) => ({ group: g, topic: shuffled[i] }));
@@ -112,8 +113,6 @@
     function copyShareLink() {
         if (currentPairs.length === 0) return;
         const str = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
-        
-        // Modern encoding for Khmer script
         const bytes = new TextEncoder().encode(str);
         let binary = "";
         for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
@@ -124,8 +123,13 @@
         
         const btn = document.getElementById('shareBtn');
         const oldText = btn.innerText;
-        btn.innerText = "ចម្លងរួចរាល់!";
-        setTimeout(() => { btn.innerText = oldText; }, 2000);
+        btn.innerHTML = "✔ ចម្លងរួចរាល់!";
+        btn.classList.add('copy-success');
+        
+        setTimeout(() => { 
+            btn.innerText = oldText; 
+            btn.classList.remove('copy-success');
+        }, 2000);
     }
 </script>
 </body>
