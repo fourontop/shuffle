@@ -141,12 +141,11 @@
     function copyShareLink() {
         if (currentPairs.length === 0) return;
         const compactString = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
-        
-        // This method turns the text into a shorter Base64 string
         const encoded = btoa(unescape(encodeURIComponent(compactString)));
-        
         const url = window.location.origin + window.location.pathname + '?s=' + encoded;
-        navigator.clipboard.writeText(url).then(() => alert("តំណភ្ជាប់លទ្ធផលត្រូវបានចម្លង!"));
+        
+        // This copies the link quietly without an alert
+        navigator.clipboard.writeText(url);
     }
 </script>
 </body>
