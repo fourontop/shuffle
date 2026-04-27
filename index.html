@@ -7,34 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #8b5cf6; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; }
-        body { 
-            font-family: 'Kantumruy Pro', -apple-system, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 1rem; 
-            margin: 0; 
-            min-height: 100vh; 
-        }
+        body { font-family: 'Kantumruy Pro', sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1rem; margin: 0; min-height: 100vh; }
         .container { max-width: 600px; width: 100%; text-align: center; padding-bottom: 100px; }
-        h1 { font-size: 1.8rem; color: var(--primary); letter-spacing: 1px; margin-bottom: 2rem; }
+        h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 2rem; }
         .inputs { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem; }
         .input-group { text-align: left; }
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; opacity: 0.8; color: var(--primary); }
-        textarea { 
-            width: 100%; height: 110px; padding: 12px; border-radius: 12px; 
-            border: 1px solid #334155; background: var(--card-bg); color: white; 
-            font-size: 16px; resize: none; box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif;
-        }
+        textarea { width: 100%; height: 110px; padding: 12px; border-radius: 12px; border: 1px solid #334155; background: var(--card-bg); color: white; font-size: 16px; resize: none; box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
         .btn-row { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { 
-            flex: 2; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; 
-            border: none; padding: 1rem; font-size: 1rem; font-weight: bold; 
-            border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-            font-family: 'Kantumruy Pro', sans-serif;
-        }
+        button { flex: 2; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; padding: 1rem; font-size: 1rem; font-weight: bold; border-radius: 12px; cursor: pointer; font-family: 'Kantumruy Pro', sans-serif; }
         #shareBtn { flex: 1; background: #334155; display: none; }
         #results { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 2rem; width: 100%; }
         .card { height: 190px; perspective: 1000px; }
@@ -58,17 +39,17 @@
     <div id="setupArea">
         <div class="inputs">
             <div class="input-group">
-                <label>បញ្ជីឈ្មោះក្រុម (មួយក្រុមក្នុងមួយជួរ)</label>
-                <textarea id="groupsInput" placeholder="ឧទាហរណ៍៖&#10;ក្រុមទី១&#10;ក្រុមទី២"></textarea>
+                <label>បញ្ជីឈ្មោះក្រុម</label>
+                <textarea id="groupsInput" placeholder="ក្រុមទី១..."></textarea>
             </div>
             <div class="input-group">
-                <label>បញ្ជីប្រធានបទ (មួយប្រធានបទក្នុងមួយជួរ)</label>
-                <textarea id="topicsInput" placeholder="ឧទាហរណ៍៖&#10;ប្រវត្តិវិទ្យា&#10;វិទ្យាសាស្ត្រ"></textarea>
+                <label>បញ្ជីប្រធានបទ</label>
+                <textarea id="topicsInput" placeholder="ប្រធានបទ..."></textarea>
             </div>
         </div>
         <div class="btn-row">
             <button onclick="runAssignment()">ចាប់ផ្តើមចាប់ឆ្នោត</button>
-            <button id="shareBtn" onclick="copyShareLink()">ចម្លងតំណភ្ជាប់លទ្ធផល</button>
+            <button id="shareBtn" onclick="copyShareLink()">ចម្លងតំណភ្ជាប់</button>
         </div>
     </div>
     <div id="results"></div>
@@ -79,36 +60,34 @@
 <script>
     let currentPairs = [];
 
-    // Decodes the URL on page load
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const sharedData = urlParams.get('s');
-        if (sharedData) {
+        const s = urlParams.get('s');
+        if (s) {
             try {
-                // Correctly decodes Base64 even with Khmer/Unicode characters
-                const decoded = decodeURIComponent(escape(atob(sharedData)));
+                // Modern decoding that handles Khmer perfectly
+                const binary = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                const decoded = new TextDecoder().decode(bytes);
+                
                 const pairs = decoded.split('|').map(item => {
                     const [group, topic] = item.split(':');
                     return { group, topic };
                 });
                 displayResults(pairs, true);
                 document.getElementById('setupArea').style.display = 'none';
-            } catch (e) { 
-                console.error("Link error", e); 
-            }
+            } catch (e) { console.error("Link error", e); }
         }
     };
 
     function runAssignment() {
-        const groups = document.getElementById('groupsInput').value.split('\n').filter(g => g.trim() !== "");
-        let topics = document.getElementById('topicsInput').value.split('\n').filter(t => t.trim() !== "");
+        const gIn = document.getElementById('groupsInput').value.split('\n').filter(g => g.trim() !== "");
+        const tIn = document.getElementById('topicsInput').value.split('\n').filter(t => t.trim() !== "");
+        if (gIn.length === 0 || tIn.length < gIn.length) return alert("សូមពិនិត្យមើលបញ្ជីឡើងវិញ!");
         
-        if (groups.length === 0 || topics.length < groups.length) {
-            return alert("សូមពិនិត្យមើលបញ្ជីឈ្មោះក្រុម និងប្រធានបទឡើងវិញ!");
-        }
-
-        const shuffledTopics = [...topics].sort(() => Math.random() - 0.5);
-        currentPairs = groups.map((g, i) => ({ group: g, topic: shuffledTopics[i] }));
+        const shuffled = [...tIn].sort(() => Math.random() - 0.5);
+        currentPairs = gIn.map((g, i) => ({ group: g, topic: shuffled[i] }));
         displayResults(currentPairs, false);
         document.getElementById('shareBtn').style.display = 'block';
     }
@@ -119,14 +98,7 @@
         pairs.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card' + (isShared ? '' : ' shuffling');
-            card.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-front">?</div>
-                    <div class="card-back">
-                        <div class="group-name">${p.group}</div>
-                        <div class="topic-text">${p.topic}</div>
-                    </div>
-                </div>`;
+            card.innerHTML = `<div class="card-inner"><div class="card-front">?</div><div class="card-back"><div class="group-name">${p.group}</div><div class="topic-text">${p.topic}</div></div></div>`;
             container.appendChild(card);
         });
         setTimeout(() => {
@@ -137,15 +109,23 @@
         }, isShared ? 100 : 1200);
     }
 
-    // Creates the Base64 link
     function copyShareLink() {
         if (currentPairs.length === 0) return;
-        const compactString = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
-        const encoded = btoa(unescape(encodeURIComponent(compactString)));
-        const url = window.location.origin + window.location.pathname + '?s=' + encoded;
+        const str = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
         
-        // This copies the link quietly without an alert
+        // Modern encoding for Khmer script
+        const bytes = new TextEncoder().encode(str);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        const encoded = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        
+        const url = window.location.origin + window.location.pathname + '?s=' + encoded;
         navigator.clipboard.writeText(url);
+        
+        const btn = document.getElementById('shareBtn');
+        const oldText = btn.innerText;
+        btn.innerText = "ចម្លងរួចរាល់!";
+        setTimeout(() => { btn.innerText = oldText; }, 2000);
     }
 </script>
 </body>
