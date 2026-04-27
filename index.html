@@ -7,53 +7,111 @@
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #8b5cf6; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --success: #10b981; }
-        body { font-family: 'Kantumruy Pro', sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1rem; margin: 0; min-height: 100vh; }
-        .container { max-width: 600px; width: 100%; text-align: center; padding-bottom: 120px; }
+        
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 600px; 
+            width: 90%; 
+            text-align: center; 
+            padding: 2rem 0 150px 0; 
+        }
+
         h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 2rem; }
         
-        /* Setup */
         .inputs { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem; }
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; opacity: 0.8; color: var(--primary); text-align: left; }
-        textarea { width: 100%; height: 100px; padding: 12px; border-radius: 12px; border: 1px solid #334155; background: var(--card-bg); color: white; font-size: 16px; resize: none; box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
         
-        /* Buttons */
+        textarea { 
+            width: 100%; height: 100px; padding: 12px; border-radius: 12px; 
+            border: 1px solid #334155; background: var(--card-bg); color: white; 
+            font-size: 16px; resize: none; box-sizing: border-box; 
+            font-family: 'Kantumruy Pro', sans-serif; 
+        }
+        
         .btn-row { display: flex; gap: 10px; margin-top: 20px; width: 100%; justify-content: center; }
-        button { padding: 1rem 1.5rem; font-size: 1rem; font-weight: bold; border-radius: 12px; cursor: pointer; font-family: 'Kantumruy Pro', sans-serif; border: none; transition: 0.3s; }
-        .draw-btn { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; flex: 2; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-        .draw-btn:disabled { background: #334155; cursor: not-allowed; transform: scale(0.95); opacity: 0.7; }
-        .reset-btn { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+        
+        button { 
+            padding: 1rem 1.5rem; font-size: 1rem; font-weight: bold; border-radius: 12px; 
+            cursor: pointer; font-family: 'Kantumruy Pro', sans-serif; border: none; transition: 0.3s; 
+        }
+        
+        .draw-btn { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; flex: 2; }
+        .draw-btn:disabled { background: #334155; cursor: not-allowed; opacity: 0.5; }
+        .reset-btn { background: #1e293b; color: #94a3b8; border: 1px solid #334155; flex: 1; }
 
-        /* Card Display Area */
-        #results { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 2rem; width: 100%; }
+        #results { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+            margin-top: 2rem; 
+            width: 100%; 
+        }
         
-        /* Card Animation */
-        .card { height: 190px; perspective: 1000px; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes slideUp { from { transform: translateY(50px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        
-        .card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s; transform: rotateY(180deg); }
-        .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 15px; padding: 10px; box-sizing: border-box; background-color: #ffffff; color: #0f172a; border: 2px solid #e2e8f0; }
-        
-        .group-name { font-size: 0.8rem; color: #64748b; margin-bottom: 8px; font-weight: bold; }
-        .topic-text { font-weight: 700; font-size: 1.1rem; text-align: center; color: #1e293b; }
+        /* Fixed Card Styling */
+        .card { 
+            height: 180px; 
+            background: white; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px; 
+            box-sizing: border-box; 
+            color: #0f172a; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: cardAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
 
-        footer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; padding: 20px 0; font-size: 0.85rem; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); text-align: center; border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; }
+        @keyframes cardAppear {
+            from { transform: translateY(30px) scale(0.5); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        .group-name { font-size: 0.75rem; color: #64748b; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .topic-text { font-weight: 700; font-size: 1.1rem; text-align: center; line-height: 1.4; }
+
+        /* ABSOLUTE CENTER FOOTER */
+        footer { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0;
+            width: 100%;
+            padding: 20px 0; 
+            font-size: 0.85rem; 
+            background: rgba(15, 23, 42, 0.9); 
+            backdrop-filter: blur(10px); 
+            text-align: center; 
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000;
+        }
         footer strong { color: var(--primary); margin-left: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>ចាប់ប្រធានបទ</h1>
+    <h1 id="title">ចាប់ប្រធានបទ</h1>
     
     <div id="setupArea">
         <div class="inputs">
             <div class="input-group">
                 <label>បញ្ជីឈ្មោះក្រុម</label>
-                <textarea id="groupsInput" placeholder="ក្រុមទី១&#10;ក្រុមទី២"></textarea>
+                <textarea id="groupsInput" placeholder="បញ្ចូលឈ្មោះក្រុម..."></textarea>
             </div>
             <div class="input-group">
                 <label>បញ្ជីប្រធានបទ</label>
-                <textarea id="topicsInput" placeholder="ប្រធានបទ A&#10;ប្រធានបទ B"></textarea>
+                <textarea id="topicsInput" placeholder="បញ្ចូលប្រធានបទ..."></textarea>
             </div>
         </div>
         <button class="draw-btn" style="width: 100%;" onclick="startShuffle()">រៀបចំការចាប់ឆ្នោត</button>
@@ -62,7 +120,7 @@
     <div id="playArea" style="display: none;">
         <div class="btn-row">
             <button id="drawBtn" class="draw-btn" onclick="drawOneCard()">ចាប់យកមួយសន្លឹក</button>
-            <button class="reset-btn" onclick="location.reload()">ចាប់ផ្តើមឡើងវិញ</button>
+            <button class="reset-btn" onclick="location.reload()">កំណត់ឡើងវិញ</button>
         </div>
         <div id="results"></div>
     </div>
@@ -81,11 +139,13 @@
             return alert("ចំនួនប្រធានបទត្រូវតែស្មើ ឬច្រើនជាងចំនួនក្រុម!");
         }
 
-        // Shuffle groups and topics
+        // Title Change
+        document.getElementById('title').innerText = "លទ្ធផលនៃការចាប់ឆ្នោត";
+
+        // Shuffle logic
         const shuffledGroups = [...gIn].sort(() => Math.random() - 0.5);
         const shuffledTopics = [...tIn].sort(() => Math.random() - 0.5);
         
-        // Create the deck
         deck = shuffledGroups.map((g, i) => ({ group: g, topic: shuffledTopics[i] }));
         
         document.getElementById('setupArea').style.display = 'none';
@@ -95,25 +155,22 @@
     function drawOneCard() {
         if (deck.length === 0) return;
 
-        const pair = deck.shift(); // Get the next pair
+        const pair = deck.shift();
         const container = document.getElementById('results');
         
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card';
         cardDiv.innerHTML = `
-            <div class="card-inner">
-                <div class="card-back">
-                    <div class="group-name">${pair.group}</div>
-                    <div class="topic-text">${pair.topic}</div>
-                </div>
-            </div>
+            <div class="group-name">${pair.group}</div>
+            <div class="topic-text">${pair.topic}</div>
         `;
         
-        container.prepend(cardDiv); // Add new card to the top/start
+        // Adds the new card at the beginning of the grid
+        container.insertBefore(cardDiv, container.firstChild);
 
         if (deck.length === 0) {
             const btn = document.getElementById('drawBtn');
-            btn.innerText = "ចប់សព្វគ្រប់ ✔";
+            btn.innerText = "អស់ហើយ ✔";
             btn.disabled = true;
         }
     }
