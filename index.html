@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ចាប់ប្រធានបទ</title>
+    <title>កម្មវិធីចាប់ឆ្នោតប្រធានបទ</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #8b5cf6; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; }
@@ -54,7 +54,7 @@
 <body>
 
 <div class="container">
-    <h1>ចាប់ប្រធានបទ</h1>
+    <h1>កម្មវិធីចាប់ឆ្នោតប្រធានបទ</h1>
     <div id="setupArea">
         <div class="inputs">
             <div class="input-group">
@@ -79,13 +79,13 @@
 <script>
     let currentPairs = [];
 
-    // This part runs when someone opens a shared link
+    // Decodes the URL on page load
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const sharedData = urlParams.get('s');
         if (sharedData) {
             try {
-                // Decodes the Base64 string back into Khmer characters correctly
+                // Correctly decodes Base64 even with Khmer/Unicode characters
                 const decoded = decodeURIComponent(escape(atob(sharedData)));
                 const pairs = decoded.split('|').map(item => {
                     const [group, topic] = item.split(':');
@@ -137,12 +137,12 @@
         }, isShared ? 100 : 1200);
     }
 
-    // This creates the much shorter Base64 link
+    // Creates the Base64 link
     function copyShareLink() {
         if (currentPairs.length === 0) return;
         const compactString = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
         
-        // Encodes Khmer text into a shorter alphabet/number string
+        // This method turns the text into a shorter Base64 string
         const encoded = btoa(unescape(encodeURIComponent(compactString)));
         
         const url = window.location.origin + window.location.pathname + '?s=' + encoded;
