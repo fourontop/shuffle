@@ -16,7 +16,17 @@
         textarea { width: 100%; height: 110px; padding: 12px; border-radius: 12px; border: 1px solid #334155; background: var(--card-bg); color: white; font-size: 16px; resize: none; box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
         .btn-row { display: flex; gap: 10px; margin-bottom: 20px; }
         button { flex: 2; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; padding: 1rem; font-size: 1rem; font-weight: bold; border-radius: 12px; cursor: pointer; font-family: 'Kantumruy Pro', sans-serif; }
-        #shareBtn { flex: 1; background: #334155; display: none; }
+       #shareBtn { 
+            flex: 1; 
+            background: #334155; 
+            display: none; 
+            transition: all 0.3s ease;
+        }
+        /* This class will be applied when clicked */
+        .copy-success {
+            background: #10b981 !important; /* Green color for success */
+            color: white;
+        }
         #results { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 2rem; width: 100%; }
         .card { height: 190px; perspective: 1000px; }
         .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transform-style: preserve-3d; }
@@ -111,21 +121,33 @@
 
     function copyShareLink() {
         if (currentPairs.length === 0) return;
+        
+        // Create the data string
         const str = currentPairs.map(p => `${p.group}:${p.topic}`).join('|');
         
-        // Modern encoding for Khmer script
+        // Encode for Khmer
         const bytes = new TextEncoder().encode(str);
         let binary = "";
         for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
         const encoded = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
         
         const url = window.location.origin + window.location.pathname + '?s=' + encoded;
+        
+        // Copy to clipboard
         navigator.clipboard.writeText(url);
         
+        // Visual Feedback with Tick Symbol
         const btn = document.getElementById('shareBtn');
         const oldText = btn.innerText;
-        btn.innerText = "ចម្លងរួចរាល់!";
-        setTimeout(() => { btn.innerText = oldText; }, 2000);
+        
+        btn.innerHTML = "✔ រួចរាល់"; // Tick symbol + Done in Khmer
+        btn.classList.add('copy-success');
+        
+        // Reset button after 2 seconds
+        setTimeout(() => { 
+            btn.innerText = oldText; 
+            btn.classList.remove('copy-success');
+        }, 2000);
     }
 </script>
 </body>
